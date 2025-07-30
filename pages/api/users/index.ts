@@ -5,7 +5,8 @@ import bcrypt from "bcrypt";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method === 'GET') {
         try{
-            const [rows] = await pool.query('SELECT id, username, created_at FROM users WHERE activo = "Y"');
+            /* const [rows] = await pool.query('SELECT id, username, created_at FROM users WHERE activo = "Y"'); */
+            const [rows] = await pool.query('SELECT id, username, created_at, activo FROM users');
             return res.status(200).json(rows)
         }catch (error){
             console.error('Error al obtener usuarios: ', error);
