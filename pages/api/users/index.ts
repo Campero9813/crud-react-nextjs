@@ -14,11 +14,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
     }
     if (req.method === 'POST') {
-        const { username, password } = req.body;
+        const { username, password, activo } = req.body as {
+            username?: string;
+            password?: string;
+            activo?: 'Y' | 'N';
+        };
         
         if (!username || !password){
             return res.status(400).json({ message: 'Usuario y contraseña Requeridos' });
         }
+
+        const status = activo === 'N' ? 'N' : 'Y';
+
         try{
             const [rows] = await pool.query('SELECT id FROM users WHERE username = ?', [username]);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 return res.status(409).json({ message: 'El usuario ya existe' });
             }
             const hashedPassword = await bcrypt.hash(password, 10);
-            await pool.query('INSERT INTO users (username, password) VALUES (?,?)', [username, hashedPassword]);
+            await pool.query('INSERT INTO users (username, password, activo) VALUES (?,?, ?)', [username, hashedPassword, status]);
             return res.status(201).json({ message: 'Usuario Creado' });
         } catch (error){
             console.error('Error al crear el usuario', error)
