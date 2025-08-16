@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') {
-        return res.status(405).json({ message: 'Meotodo no permitido' });
+        return res.status(405).json({ message: 'Metodo no permitido' });
     }
 
     const { username, password } = req.body;
@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const [rows] = await pool.query('SELECT id FROM users WHERE username = ?', [username]);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if ((rows as any[]).length > 0 ) {
-            return res.status(409).json({ message: 'El uuario ya existe' });
+            return res.status(409).json({ message: 'El usuario ya existe' });
         }
 
         //Encriptar contraseña

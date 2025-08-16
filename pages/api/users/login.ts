@@ -1,6 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import pool from "@/lib/db";
 import bcrypt from 'bcrypt';
+//importamos JWT para autenticacion
+import jwt from 'jsonwebtoken';
+import serialize from "js-cookie";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -21,14 +24,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
-    const user = users[0];  // ✔️ Obtener primer usuario
+    const user = users[0];  //Obtener primer usuario
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
-    return res.status(200).json({ message: 'Login exitoso', user: { id: user.id, username: user.username } });
+    const token = jwt.sign(
+      { id: user.id, username: user.username },
+      process.env.JWT_SECRET || 'clave-secreta', //Colocar clave secreta
+      { expiresIn: '1h' }
+    )
+
+    res.setHeader(
+      "Set-Cookie",
+      serialize("token", token, {
+        httpOnly: true, //Seguridad
+        secure
+      })
+    )
+
+    return res.status(200).json({ message: 'Login exitoso', token, user: { id: user.id, username: user.username } });
 
   } catch (error) {
     console.error('Error en el login:', error);
