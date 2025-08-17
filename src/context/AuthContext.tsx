@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Cookies from 'js-cookie';
+//import Cookies from 'js-cookie';
 
 type AuthContextType = {
   isAuthenticated: boolean;
@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Al cargar, verificamos si existe un token en localStorage
+    //Solo en el lado del cliente
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       setToken(storedToken);
@@ -31,14 +31,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const login = (newToken: string) => {
-    localStorage.setItem("token", newToken);
-    setToken(newToken);
+    localStorage.setItem("token", newToken || "session");
+    setToken(newToken || "session");
     setIsAuthenticated(true);
   };
 
   const logout = () => {
     localStorage.removeItem("token");
-    Cookies.remove("token"); //Eliminar cookie
+    //Cookies.remove("token"); //Eliminar cookie
     setToken(null);
     setIsAuthenticated(false);
     router.push("/"); // Redirige al login

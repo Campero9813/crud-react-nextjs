@@ -11,7 +11,7 @@ export default function NewUserPage(){
     const router = useRouter();
     const [form, setForm] = useState<FormState>({ username: '', password: '', activo: 'Y'});
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<String | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -28,12 +28,13 @@ export default function NewUserPage(){
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(form),
+                // credentials: "include", //Envia cookie al token
             });
 
             const data = await res.json();
             if (res.status === 201 ){
                 //Success -> Regresar al listado despues de guardar
-                router.push('/');
+                router.push('/dashboards');
             }else {
                 setError(data?.message || 'Error al guardar')
             }

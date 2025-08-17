@@ -3,7 +3,7 @@ import pool from "@/lib/db";
 import bcrypt from 'bcrypt';
 //importamos JWT para autenticacion
 import jwt from 'jsonwebtoken';
-import serialize from "js-cookie";
+import { serialize } from "cookie";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -41,9 +41,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       "Set-Cookie",
       serialize("token", token, {
         httpOnly: true, //Seguridad
-        secure
+        secure: process.env.NODE_ENV === "production", //Solo http en prod
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60, //1 hora
       })
-    )
+    );
 
     return res.status(200).json({ message: 'Login exitoso', token, user: { id: user.id, username: user.username } });
 

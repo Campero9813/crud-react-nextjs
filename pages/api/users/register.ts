@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import pool from "@/lib/db";
 import bcrypt from 'bcrypt';
+import jwt from "jsonwebtoken";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') {
@@ -14,6 +15,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
+        //Verificacion de token en la cookie
+        const token = req.cookies.token;
+        if(!token) return res.status(401).json({message: "No autenticado"});
+        try {;
+            jwt.verify(token, process.env.JWT_SECRET || "clave-secreta")
+        } catch {
+            return res.status(403).json({message: "Token invalido o expirado"});
+        }
+
         //Verificacion de usuario existente
         const [rows] = await pool.query('SELECT id FROM users WHERE username = ?', [username]);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

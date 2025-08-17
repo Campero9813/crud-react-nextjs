@@ -32,8 +32,8 @@ export default function LoginForm(){
             const data = await res.json();
             if (res.status === 200 && data.token) {
                 //Guardamos un token real en Contexto y LocalStorage
-                login(data.token);
-                Cookies.set("token", data.token, {expires: 1}); //dura un dia
+                login(data.token || "session");
+                //Cookies.set("token", data.token, {expires: 1}); //dura un dia
                 router.push("/dashboards"); //Ruta protegida                
             }else{
                 setError(data?.message || "Credenciales invalidas");
