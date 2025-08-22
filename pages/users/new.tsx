@@ -39,13 +39,13 @@ export default function NewUserPage(){
                 setError(data?.message || 'Error al guardar')
             }
         } catch {
-            setError('Erro de red o del servidor');
+            setError('Error de red o del servidor');
         } finally {
             setLoading(false);
         }
     }
 
-    const handleCancel = () => router.push('/');
+    const handleCancel = () => router.push('/dashboards');
 
     return (
         <main className='min-h-screen bg-gray-100 p-6'>

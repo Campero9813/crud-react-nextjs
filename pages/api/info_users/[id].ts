@@ -9,6 +9,25 @@ export default async function handler (req: NextApiRequest, res: NextApiResponse
         return res.status(400).json({message: "ID Invalido o desconocido"});
     }
 
+    //POST Para agregar perfiles
+    if (req.method === "POST") {
+        try {
+            const {user_id, nombre, telefono, correo, imagen_perfil} = req.body;
+            if(!user_id) return res.status(400).json({message: "User_id es requerido"});
+            
+            const [result] = await pool.query<ResultSetHeader>(
+                `INSERT INTO info_users (user_id, nombre, telefono, correo, imagen_perfil, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ? NOW(), NOW())`,
+                 [user_id, nombre ?? '', telefono ?? '', correo ?? '', imagen_perfil ?? '']
+            );
+            return res.status(202).json({message: "Perfil ingresa con exito", id: result.insertId})
+        } catch (error) {
+            console.error("Error al guardar los datos", error);
+            return res.status(500).json({message: "Error interno del servidor"})
+        }
+        
+    }
+
     //GET Para registro especifico
     if(req.method === "GET"){
         try {
@@ -16,7 +35,7 @@ export default async function handler (req: NextApiRequest, res: NextApiResponse
                 `SELECT iu.*, u.username
                 FROM info_users iu
                 INNER JOIN users u ON u.id = iu.user_id
-                WHERE iu.id= ?`,
+                WHERE iu.user_id = ?`,
                 [id]
             );
 
@@ -49,9 +68,9 @@ export default async function handler (req: NextApiRequest, res: NextApiResponse
             );
 
             if(result.affectedRows === 0){
-                return res.status(404).json({message: "Nose encontro el registro para actualizar"});
+                return res.status(404).json({message: "No se encontro el registro para actualizar"});
             }
-            return res.status(200).json({message: "Informacion actualizada"});
+            return res.status(200).json({message: "Información actualizada"});
         } catch (error) {
             console.error("Error al actualizar info_user: ", error);
             return res.status(500).json({message: "Error interno del servidor"})
