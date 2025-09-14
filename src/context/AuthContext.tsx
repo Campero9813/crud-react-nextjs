@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 type AuthContextType = {
   isAuthenticated: boolean;
   token: string | null;
-  login: (token: string) => void;
+  login: () => void;
   logout: () => void;
 };
 
@@ -21,23 +21,47 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  useEffect(() => {
+/*   useEffect(() => {
     //Solo en el lado del cliente
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       setToken(storedToken);
       setIsAuthenticated(true);
     }
-  }, []);
+  }, []); */
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/verify", {
+          method: "GET",
+          credentials: "include", //Este lleva las cookies
+        })
 
-  const login = (newToken: string) => {
-    localStorage.setItem("token", newToken || "session");
-    setToken(newToken || "session");
+        if(res.ok){
+          const data = await res.json();
+          setIsAuthenticated(true);
+          setToken("valid");
+        } else {
+          setIsAuthenticated(false)
+          setToken(null)
+        }
+      } catch(err) {
+        console.error("Auth check error", err)
+        setIsAuthenticated(false)
+      }
+    }
+    checkAuth();
+  }, [])
+
+  const login = () => {
+    /* localStorage.setItem("token", newToken || "session");
+    setToken(newToken || "session"); */
     setIsAuthenticated(true);
   };
 
-  const logout = () => {
-    localStorage.removeItem("token");
+  const logout = async () => {
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include"})
+    /* localStorage.removeItem("token"); */
     //Cookies.remove("token"); //Eliminar cookie
     setToken(null);
     setIsAuthenticated(false);

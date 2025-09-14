@@ -48,7 +48,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     );
 
-    return res.status(200).json({ message: 'Login exitoso', token, user: { id: user.id, username: user.username } });
+    return res.status(200).json({ message: 'Login exitoso', user: { id: user.id, username: user.username } });
 
   } catch (error) {
     console.error('Error en el login:', error);

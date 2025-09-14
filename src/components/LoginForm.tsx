@@ -26,10 +26,18 @@ export default function LoginForm(){
             const res = await fetch("/api/users/login", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
+                credentials: "include", // Importante para manejar cookies
                 body: JSON.stringify({username, password}),
             });
 
-            const data = await res.json();
+            if (res.ok) {
+                const data = await res.json();
+                console.log("Login exitoso", data);
+                login(); //Actualiza el contexto
+                router.push("/dashboards")
+            }
+
+/*             const data = await res.json();
             if (res.status === 200 && data.token) {
                 //Guardamos un token real en Contexto y LocalStorage
                 login(data.token || "session");
@@ -37,7 +45,7 @@ export default function LoginForm(){
                 router.push("/dashboards"); //Ruta protegida                
             }else{
                 setError(data?.message || "Credenciales invalidas");
-            }
+            } */
 
         } catch {
             setError("Error de red o de servidor");
