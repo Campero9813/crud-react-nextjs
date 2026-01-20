@@ -19,7 +19,7 @@ export default function Dashboard() {
     return (
         <main className='min-h-screen bg-gray-100 p-6'>
             <div className='flex justify-between mb-6'>
-                <h1 className='text-3xl font-bold'>CRUD de Usuarios</h1>
+                <h1 className='text-3xl font-bold'>CRUD de Usuarios Prueba</h1>
                 <button
                     onClick={logout}
                     className='bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700'
